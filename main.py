@@ -4,12 +4,11 @@ from langchain_ollama import ChatOllama
 from langgraph.graph import StateGraph, START, END
 
 
-from agents import node_parse_input, node_ip_scan, node_domain_scan, node_url_scan, route_request
+from agents import node_parse_input, node_ip_scan, node_domain_scan, node_url_scan, route_request, node_report_generator
 from models import State
 from tools import create_initial_state
 from config import setup_logging
 from dotenv import load_dotenv
-import os
 
 
 
@@ -40,7 +39,7 @@ def main():
     graph_builder = StateGraph(State)
     logger.info(f"Initial state created")
     
-    # input_text = edge_case_inputs[2]
+    input_text = valid_inputs[5]
     
     
     graph_builder.add_node("parse_input", node_parse_input(llm))
@@ -48,6 +47,8 @@ def main():
     graph_builder.add_node("ip_scan", node_ip_scan(llm))
     graph_builder.add_node("domain_scan", node_domain_scan(llm))
     graph_builder.add_node("url_scan", node_url_scan(llm))
+    
+    graph_builder.add_node("report_generator", node_report_generator(llm))
     
     graph_builder.add_edge(START, "parse_input")
     graph_builder.add_conditional_edges("parse_input",
@@ -58,20 +59,21 @@ def main():
                                             "url": "url_scan",
                                             "error": END
                                         })
-    graph_builder.add_edge("ip_scan", END)
-    graph_builder.add_edge("domain_scan", END)
-    graph_builder.add_edge("url_scan", END)
+    graph_builder.add_edge("ip_scan", "report_generator")
+    graph_builder.add_edge("url_scan", "domain_scan")
+    graph_builder.add_edge("domain_scan", "ip_scan")
+    graph_builder.add_edge("report_generator", END)
     
-    for input_text in valid_inputs+edge_case_inputs:
+    state = create_initial_state(input_text)
+    logger.info(f"Initial state created")    
         
-        state = create_initial_state(input_text)
-        logger.info(f"Initial state created")    
+    graph = graph_builder.compile()
+    logger.info("Graph compiled successfully")
         
-        graph = graph_builder.compile()
-        logger.info("Graph compiled successfully")
         
-        result = graph.invoke(state)
-        print(result)
+        
+    result = graph.invoke(state)
+    print(result["tool_outputs"])
 
     
     

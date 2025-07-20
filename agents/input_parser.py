@@ -67,6 +67,7 @@ def parse_input(input_text : str, llm : ChatOllama) -> State:
     
     state = State({
         "target_type": parsed_data.get("target_type"),
+        "orig_target_value": parsed_data.get("target_value"),
         "target_value": parsed_data.get("target_value"),
         "tasks": parsed_data.get("tasks", []),
         "tool_outputs": {},
