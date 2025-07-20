@@ -15,18 +15,22 @@ Your job is to:
    - For a URL, remove trailing paths or parameters
    - For domain/IP, return as-is
 
-4. Infer a list of tasks if mentioned (e.g., port scanning, web tech detection).
+4. Infer a list of tasks if mentioned (e.g., port scanning, web tech detection, directory brute-forcing, vulnerability scanning).
    Use only the following task names:
-   - "port_scan"
-   - "web_tech"
-   - "dns_lookup"
-   - "whois"
+   - "port_scan"    → Use Nmap to scan for open ports and services
+   - "web_tech"     → Use WhatWeb to detect web technologies
+   - "dns_lookup"   → Use DNSRecon to enumerate DNS records
+   - "whois"        → Use WHOIS to look up domain registration
+   - "dir_enum"     → Use Gobuster to enumerate hidden directories
+   - "vuln_scan"    → Use Wapiti to scan for common vulnerabilities
    If nothing is specified, return an empty list — defaults will be used.
 
 5. If the input is invalid or unclear (no valid target), return:
    - has_error = true
    - a clear error_message explaining what’s wrong
-
+   An Invalid input is one that does not contain a valid IP, domain, or URL.
+   For example: multiple targets, unsupported protocols, malformed URLs, invalid IP addresses, etc.
+   
 Output the result as valid JSON in this format:
 
 {
@@ -47,4 +51,5 @@ If input is invalid:
   "error_message": "..."
 }
 """
+
 
