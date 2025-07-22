@@ -54,7 +54,7 @@ Reports are generated as `.md` files and include:
 
 ### 1. Clone and Set Up
 ```bash
-git clone https://github.com/yourusername/phantom.git
+git clone https://github.com/pranavnallari/phantom-ai.git
 cd phantom
 ```
 
